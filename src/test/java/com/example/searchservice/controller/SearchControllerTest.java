@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
@@ -56,7 +57,7 @@ class SearchControllerTest {
         ResponseEntity<Product> response = searchController.getProductById(1L);
 
         // Assert
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Product A", response.getBody().getName());
         verify(productService, times(1)).getProductById(1L);
     }
@@ -70,7 +71,7 @@ class SearchControllerTest {
         ResponseEntity<Product> response = searchController.getProductById(1L);
 
         // Assert
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         verify(productService, times(1)).getProductById(1L);
     }
 

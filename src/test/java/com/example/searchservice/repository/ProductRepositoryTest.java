@@ -2,15 +2,16 @@ package com.example.searchservice.repository;
 
 import com.example.searchservice.entity.Product;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class ProductRepositoryTest {
@@ -36,51 +37,35 @@ class ProductRepositoryTest {
         when(productRepository.searchProducts("laptop")).thenReturn(List.of(product1));
     }
 
-    @Test
-    void testSearchProducts_FoundByName() {
+    @ParameterizedTest
+    @CsvSource({
+        "Laptop, Laptop, 1",
+        "great camera, Smartphone, 1",
+        "Nonexistent, '', 0",
+        "laptop, Laptop, 1"
+    })
+    void testSearchProducts(String query, String expectedName, int expectedSize) {
         // Act
-        List<Product> results = productRepository.searchProducts("Laptop");
+        List<Product> results = productRepository.searchProducts(query);
 
         // Assert
-        assertEquals(1, results.size());
-        assertEquals("Laptop", results.get(0).getName());
+        assertEquals(expectedSize, results.size());
+        if (expectedSize > 0) {
+            assertEquals(expectedName, results.get(0).getName());
+        } else {
+            assertTrue(results.isEmpty());
+        }
     }
 
-    @Test
-    void testSearchProducts_FoundByDescription() {
-        // Act
-        List<Product> results = productRepository.searchProducts("great camera");
-
-        // Assert
-        assertEquals(1, results.size());
-        assertEquals("Smartphone", results.get(0).getName());
-    }
-
-    @Test
-    void testSearchProducts_NoResults() {
-        // Act
-        List<Product> results = productRepository.searchProducts("Nonexistent");
-
-        // Assert
-        assertTrue(results.isEmpty());
-    }
-
-    @Test
-    void testSearchProducts_CaseInsensitiveSearch() {
-        // Act
-        List<Product> results = productRepository.searchProducts("laptop");
-
-        // Assert
-        assertEquals(1, results.size());
-        assertEquals("Laptop", results.get(0).getName());
-    }
-
-    @Test
-    void testFindAllProducts() {
+    @ParameterizedTest
+    @CsvSource({
+        "3"
+    })
+    void testFindAllProducts(int expectedSize) {
         // Act
         List<Product> products = productRepository.findAll();
 
         // Assert
-        assertEquals(3, products.size());
+        assertEquals(expectedSize, products.size());
     }
 }
